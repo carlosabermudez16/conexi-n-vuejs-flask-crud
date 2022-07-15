@@ -1,0 +1,1 @@
+Este proyecto se realiza un crud usando la integración del framework para el frontend y el framework Flask para el backend. 
