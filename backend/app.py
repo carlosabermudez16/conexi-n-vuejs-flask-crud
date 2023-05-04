@@ -6,7 +6,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 Cors = CORS(app)
-CORS(app, resources = {r'/*': {'origin': '*'}}, CORS_SUPPORTS_CREDENTIALS = True)
+CORS(app, resources = {r'/api/*': {'origins': 'http://localhost:8080',
+                                   "allow_headers":"Access-Control-Allow-Origin"}}, 
+     CORS_SUPPORTS_CREDENTIALS = True)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.config['SQLALCHEMY_DATABASE_URI']= f'mysql+mysqlconnector://admin:123456@localhost:3306/integrationdb_flask_vue_crud'
@@ -26,18 +28,16 @@ class User(db.Model):
     
 db.create_all()
 
-@app.route('/dataentry', methods = ['GET', 'POST'])
+@app.route('/api/dataentry', methods = ['GET', 'POST'])
 def submit_data():
     response_object = {'status':'success'}
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "OPTIONS":
 
         post_data = request.get_json()
         company = post_data.get('company')
         designation = post_data.get('designation')
         review = post_data.get('review')
-        print(company)
-        print(designation)
-        print(review)
+        
         
         data = User(company=company, designation=designation, review=review)
 
@@ -47,7 +47,7 @@ def submit_data():
         response_object['message'] ='Data added!'
     return jsonify(response_object)
 
-@app.route('/view', methods = ['GET','POST'])
+@app.route('/api/view', methods = ['GET','POST'])
 def view_data():
     usuario = User.query.all()
     data = []
@@ -60,7 +60,7 @@ def view_data():
         data.append(dic)
     return jsonify(data)
 
-@app.route('/dataview/<dataid>', methods = ['DELETE'])
+@app.route('/api/dataview/<dataid>', methods = ['DELETE'])
 def delete_data(dataid):
     if request.method == "DELETE":
         _id = int(dataid)
@@ -71,7 +71,7 @@ def delete_data(dataid):
         
     return jsonify(response_object)
 
-@app.route('/dataview/<dataid>', methods = ['PUT'])
+@app.route('/api/dataview/<dataid>', methods = ['PUT'])
 def modify_data(dataid):
     if request.method == 'PUT':
         post_data = request.get_json()
